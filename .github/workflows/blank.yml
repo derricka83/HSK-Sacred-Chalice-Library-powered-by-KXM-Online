@@ -1,0 +1,47 @@
+name: Auto Commit Message
+
+on:
+  push:
+    branches:
+      - main
+      - 'feature/*'
+      - 'bugfix/*'
+  pull_request:
+    types: [opened, synchronize, closed]
+
+jobs:
+  generate-commit-message:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "HSK Bot"
+          git config --global user.email "bot@hsk-sacredchalice.org"
+
+      - name: Generate Commit Message
+        id: generate_commit_message
+        run: |
+          message=""
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            message="🔄 Sync: Updated ${GITHUB_REF#refs/heads/} branch"
+          elif [[ "${{ github.event_name }}" == "pull_request" && "${{ github.event.action }}" == "closed" ]]; then
+            if [[ "${{ github.event.pull_request.merged }}" == "true" ]]; then
+              message="✨ Merge: PR #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}"
+            fi
+          else
+            message="📝 Commit: Changes to ${GITHUB_REF#refs/heads/}"
+          fi
+          echo "commit_message=$message" >> $GITHUB_ENV
+
+      - name: Commit Changes
+        if: github.event_name == 'push'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git add .
+          git commit -m "${{ env.commit_message }}" || echo "No changes to commit"
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
