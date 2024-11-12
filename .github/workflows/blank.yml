@@ -72,3 +72,4 @@ The bot uses a predefined name and email for commits (HSK Bot).
 
 This will ensure all commits to your site follow a structured, consistent format without needing manual input. You can modify the message templates as needed.
 
+[![Auto Commit Message](https://github.com/derricka83/HSK-Sacred-Chalice-Library-powered-by-KXM-Online/actions/workflows/blank.yml/badge.svg)](https://github.com/derricka83/HSK-Sacred-Chalice-Library-powered-by-KXM-Online/actions/workflows/blank.yml)
